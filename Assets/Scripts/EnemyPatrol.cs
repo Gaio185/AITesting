@@ -23,7 +23,6 @@ public class EnemyPatrol : MonoBehaviour
             {
                 targetPoint = 0;
             }
-    
         }
         MoveToTarget();
     }

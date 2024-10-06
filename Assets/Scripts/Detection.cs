@@ -6,6 +6,7 @@ public class Detection : MonoBehaviour
 {
 
     public float radius;
+    public float cutoffRadius;
     [Range(0, 360)]
     public float angle;
 
@@ -20,6 +21,18 @@ public class Detection : MonoBehaviour
     {
         playerRef = GameObject.FindGameObjectWithTag("Player");
         StartCoroutine(DetectionRoutine());
+    }
+
+    void Update()
+    {
+        if(canSeePlayer)
+        {
+            transform.rotation = Quaternion.LookRotation(playerRef.transform.position - transform.position);
+        }
+        else if(tag == "Camera")
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(28.248f, 90.049f, 0.023f), 5 * Time.deltaTime);
+        }
     }
 
     private IEnumerator DetectionRoutine()
@@ -41,17 +54,24 @@ public class Detection : MonoBehaviour
 
         if(rangeChecks.Length != 0)
         {
-            Transform target = rangeChecks[0].transform;
-            Vector3 directionToTarget = (target.position - transform.position).normalized;
-
-            if(Vector3.Angle(transform.forward, directionToTarget) < angle / 2)
+            if(Vector3.Distance(transform.position, playerRef.transform.position) > cutoffRadius || tag != "Camera")
             {
-                float distanceToTarget = Vector3.Distance(transform.position, target.position);
+                Transform target = rangeChecks[0].transform;
+                Vector3 directionToTarget = (target.position - transform.position).normalized;
 
-                if(!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstacleMask))
+                if (Vector3.Angle(transform.forward, directionToTarget) < angle / 2)
                 {
-                    canSeePlayer = true;
-                    Debug.Log("Player Detected");
+                    float distanceToTarget = Vector3.Distance(transform.position, target.position);
+
+                    if (!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstacleMask))
+                    {
+                        canSeePlayer = true;
+                        Debug.Log("Player Detected");
+                    }
+                    else
+                    {
+                        canSeePlayer = false;
+                    }
                 }
                 else
                 {
@@ -61,7 +81,7 @@ public class Detection : MonoBehaviour
             else
             {
                 canSeePlayer = false;
-            }
+            }  
         }else if(canSeePlayer)
         {
             canSeePlayer = false;

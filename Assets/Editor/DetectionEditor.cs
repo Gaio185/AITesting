@@ -1,3 +1,4 @@
+using Unity.VisualScripting.YamlDotNet.Core.Tokens;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,6 +10,10 @@ public class NewBehaviourScript : Editor
         Detection detection = (Detection)target;
         Handles.color = Color.white;
         Handles.DrawWireArc(detection.transform.position, Vector3.up, Vector3.forward, 360, detection.radius);
+        if(detection.tag == "Camera")
+        {
+            Handles.DrawWireArc(detection.transform.position, Vector3.up, Vector3.forward, 360, detection.cutoffRadius);
+        }
 
         Vector3 viewAngleA = DirectionFromAngle(detection.transform.eulerAngles.y, -detection.angle / 2);
         Vector3 viewAngleB = DirectionFromAngle(detection.transform.eulerAngles.y, detection.angle / 2);
